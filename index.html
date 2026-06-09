@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>陕西理工大学周报模版</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #c0392b, #e74c3c);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 { font-size: 24px; margin-bottom: 8px; }
+        .header p { font-size: 14px; opacity: 0.9; }
+        .content { padding: 30px; }
+
+        .steps {
+            display: flex; justify-content: center; margin-bottom: 30px; gap: 0;
+        }
+        .step {
+            display: flex; align-items: center; gap: 8px;
+            padding: 10px 20px; background: #f5f5f5;
+            font-size: 14px; color: #999; font-weight: 500;
+        }
+        .step:first-child { border-radius: 8px 0 0 8px; }
+        .step:last-child { border-radius: 0 8px 8px 0; }
+        .step.active { background: #c0392b; color: white; }
+        .step.done { background: #27ae60; color: white; }
+        .step-num {
+            width: 24px; height: 24px; border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 12px; font-weight: bold;
+        }
+
+        .page { display: none; }
+        .page.active { display: block; }
+
+        .section { margin-bottom: 25px; }
+        .section-title {
+            font-size: 16px; font-weight: bold; color: #2c3e50;
+            margin-bottom: 12px; padding-left: 12px;
+            border-left: 4px solid #c0392b;
+        }
+        .form-group { margin-bottom: 15px; }
+        .form-group label {
+            display: block; font-size: 14px; color: #555;
+            margin-bottom: 6px; font-weight: 500;
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%; padding: 10px 14px;
+            border: 1px solid #ddd; border-radius: 8px;
+            font-size: 14px; transition: border-color 0.3s; font-family: inherit;
+        }
+        .form-group input:focus, .form-group textarea:focus {
+            outline: none; border-color: #c0392b;
+            box-shadow: 0 0 0 3px rgba(192, 57, 43, 0.1);
+        }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; }
+
+        .tip {
+            background: #fff3cd; border: 1px solid #ffc107;
+            border-radius: 8px; padding: 12px 16px;
+            font-size: 13px; color: #856404; margin-bottom: 20px; line-height: 1.6;
+        }
+        .tip::before { content: '💡 '; }
+
+        /* 上传区域 */
+        .upload-area {
+            border: 2px dashed #ccc; border-radius: 12px;
+            padding: 40px 20px; text-align: center;
+            cursor: pointer; transition: all 0.3s;
+            background: #fafafa;
+        }
+        .upload-area:hover, .upload-area.dragover {
+            border-color: #c0392b; background: #fef5f5;
+        }
+        .upload-icon { font-size: 48px; margin-bottom: 12px; }
+        .upload-text { font-size: 16px; color: #333; font-weight: 500; margin-bottom: 6px; }
+        .upload-hint { font-size: 13px; color: #999; }
+        .file-name {
+            margin-top: 12px; padding: 10px 15px;
+            background: #d4edda; border-radius: 8px;
+            font-size: 14px; color: #155724; display: none;
+        }
+
+        /* 粘贴备选 */
+        .paste-area {
+            width: 100%; min-height: 120px;
+            border: 2px dashed #ddd; border-radius: 10px;
+            padding: 15px; font-size: 13px; font-family: monospace;
+            resize: vertical; transition: border-color 0.3s;
+        }
+        .paste-area:focus { border-color: #c0392b; outline: none; }
+
+        .divider {
+            text-align: center; margin: 20px 0; color: #999; font-size: 13px;
+        }
+        .divider span { margin: 0 10px; }
+        .divider::before, .divider::after {
+            content: ''; display: inline-block;
+            width: 80px; height: 1px; background: #ddd; vertical-align: middle;
+        }
+
+        /* 解析结果 */
+        .parsed-count {
+            background: #d4edda; border: 1px solid #c3e6cb;
+            border-radius: 8px; padding: 10px 15px;
+            font-size: 14px; color: #155724; margin-bottom: 15px;
+        }
+        .parsed-item {
+            background: #f8f9fa; border: 1px solid #e9ecef;
+            border-radius: 8px; padding: 10px 12px; margin-bottom: 6px;
+            font-size: 13px; display: flex; align-items: center; gap: 10px;
+        }
+        .parsed-item .item-num {
+            background: #6c757d; color: white;
+            min-width: 22px; height: 22px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 11px; font-weight: bold;
+        }
+        .parsed-item .item-title { font-weight: 600; color: #2c3e50; }
+        .parsed-item .item-meta { font-size: 12px; color: #888; margin-top: 2px; }
+
+        /* 事件归类 */
+        .grouped-event {
+            background: white; border: 1px solid #dee2e6;
+            border-radius: 10px; padding: 18px; margin-bottom: 15px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .grouped-event .ge-header {
+            display: flex; align-items: center; margin-bottom: 12px; gap: 10px;
+        }
+        .grouped-event .ge-num {
+            background: #c0392b; color: white;
+            min-width: 28px; height: 28px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 13px; font-weight: bold; flex-shrink: 0;
+        }
+        .grouped-event .ge-title-input {
+            flex: 1; padding: 8px 12px;
+            border: 1px solid #ddd; border-radius: 6px;
+            font-size: 14px; font-weight: 600;
+        }
+        .grouped-event .ge-title-input:focus { outline: none; border-color: #c0392b; }
+        .grouped-event .ge-delete {
+            background: none; border: none; color: #ccc;
+            font-size: 20px; cursor: pointer; padding: 4px 8px; border-radius: 4px;
+        }
+        .grouped-event .ge-delete:hover { background: #fee; color: #e74c3c; }
+        .grouped-event .ge-info {
+            display: grid; grid-template-columns: 150px 1fr;
+            gap: 8px; margin-bottom: 10px;
+        }
+        .grouped-event .ge-info input {
+            padding: 6px 10px; border: 1px solid #e0e0e0;
+            border-radius: 5px; font-size: 13px;
+        }
+        .grouped-event .ge-info input:focus { outline: none; border-color: #c0392b; }
+        .grouped-event .ge-posts {
+            background: #f8f9fa; border-radius: 6px;
+            padding: 10px; font-size: 12px; color: #555;
+            max-height: 200px; overflow-y: auto;
+        }
+        .grouped-event .ge-posts .post-item {
+            padding: 6px 0; border-bottom: 1px solid #eee;
+        }
+        .grouped-event .ge-posts .post-item:last-child { border-bottom: none; }
+        .grouped-event .ge-posts .post-author { color: #c0392b; font-weight: 500; }
+        .grouped-event .ge-posts .post-url { color: #007bff; word-break: break-all; font-size: 11px; }
+
+        .add-group-btn {
+            width: 100%; padding: 12px;
+            border: 2px dashed #ccc; border-radius: 8px;
+            background: white; color: #888; font-size: 14px;
+            cursor: pointer; transition: all 0.2s; margin-top: 12px;
+        }
+        .add-group-btn:hover { border-color: #c0392b; color: #c0392b; background: #fef5f5; }
+
+        /* 按钮 */
+        .btn-group { display: flex; gap: 12px; margin-top: 25px; justify-content: center; }
+        .btn {
+            padding: 12px 28px; border: none; border-radius: 8px;
+            font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.2s;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #c0392b, #e74c3c);
+            color: white; box-shadow: 0 4px 15px rgba(192, 57, 43, 0.3);
+        }
+        .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(192, 57, 43, 0.4); }
+        .btn-secondary { background: #f0f0f0; color: #555; }
+        .btn-secondary:hover { background: #e0e0e0; }
+        .btn-success {
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+            color: white; box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
+        }
+        .btn-success:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(39, 174, 96, 0.4); }
+
+        /* 预览 */
+        .preview-overlay {
+            display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.6); z-index: 1000; overflow-y: auto; padding: 20px;
+        }
+        .preview-overlay.show { display: block; }
+        .preview-container {
+            max-width: 800px; margin: 0 auto;
+            background: white; border-radius: 12px; padding: 50px 40px;
+        }
+        .preview-close {
+            position: fixed; top: 30px; right: 30px;
+            background: #e74c3c; color: white; border: none;
+            width: 40px; height: 40px; border-radius: 50%;
+            font-size: 20px; cursor: pointer; z-index: 1001;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+        .preview-content {
+            font-family: '仿宋', FangSong, serif; font-size: 16px; line-height: 2;
+        }
+        .preview-content .red-title { text-align: center; color: #c0392b; font-size: 22px; font-weight: bold; }
+        .preview-content .big-title { text-align: center; color: #c0392b; font-size: 28px; font-weight: bold; margin: 10px 0; }
+        .preview-content .center-text { text-align: center; margin: 5px 0; }
+        .preview-content .section-heading { font-family: '黑体', SimHei, sans-serif; font-weight: bold; margin: 20px 0 10px; }
+        .preview-content .event-title-preview { font-family: '楷体', KaiTi, serif; font-weight: bold; margin: 15px 0 5px; }
+        .preview-content .indent { text-indent: 2em; }
+        .preview-content table { width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 14px; }
+        .preview-content table th, .preview-content table td { border: 1px solid #333; padding: 6px 8px; text-align: center; }
+        .preview-content table th { font-family: '黑体', SimHei, sans-serif; background: #f5f5f5; }
+
+        .loading-overlay {
+            display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(255,255,255,0.8); z-index: 2000;
+            justify-content: center; align-items: center; flex-direction: column;
+        }
+        .loading-overlay.show { display: flex; }
+        .spinner {
+            border: 4px solid #f3f3f3; border-top: 4px solid #c0392b;
+            border-radius: 50%; width: 40px; height: 40px;
+            animation: spin 0.8s linear infinite; margin-bottom: 15px;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>陕西理工大学信息提醒周报生成器</h1>
+            <p>上传Excel数据 → 自动归类事件 → 生成Word文档</p>
+        </div>
+
+        <div class="content">
+            <div class="steps">
+                <div class="step active" id="step1"><span class="step-num">1</span><span>导入数据</span></div>
+                <div class="step" id="step2"><span class="step-num">2</span><span>确认归类</span></div>
+                <div class="step" id="step3"><span class="step-num">3</span><span>生成报告</span></div>
+            </div>
+
+            <!-- 第一步 -->
+            <div class="page active" id="page1">
+                <div class="tip">
+                    上传Excel文件（.xlsx），工具会自动读取数据、识别列名、归类同类事件并生成周报。
+                </div>
+
+                <div class="section">
+                    <div class="section-title">基本信息</div>
+                    <div class="form-row-3">
+                        <div class="form-group"><label>期号（第X期）</label><input type="number" id="issueNum" value="10" min="1"></div>
+                        <div class="form-group"><label>总期号（总第X期）</label><input type="number" id="totalIssue" value="52" min="1"></div>
+                        <div class="form-group"><label>年份</label><input type="number" id="year" value="2026" min="2020"></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group"><label>监测起始日期</label><input type="date" id="startDate"></div>
+                        <div class="form-group"><label>监测结束日期</label><input type="date" id="endDate"></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group"><label>编辑</label><input type="text" id="editor" value="王逸飞" placeholder="填写编辑姓名"></div>
+                        <div class="form-group"><label>审签</label><input type="text" id="reviewer" value="陈燕" placeholder="填写审签姓名"></div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="section-title">导入数据</div>
+                    
+                    <!-- 上传Excel -->
+                    <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
+                        <div class="upload-icon">📊</div>
+                        <p class="upload-text">点击上传 Excel 文件（.xlsx / .xls / .csv）</p>
+                        <p class="upload-hint">或将文件拖拽到此处</p>
+                    </div>
+                    <input type="file" id="fileInput" accept=".xlsx,.xls,.csv" style="display:none;">
+                    <div class="file-name" id="fileName"></div>
+
+                    <!-- 分隔 -->
+                    <div class="divider"><span>或者粘贴文本数据</span></div>
+
+                    <!-- 粘贴备选 -->
+                    <textarea class="paste-area" id="rawData" placeholder="也可以从Excel复制后直接粘贴到这里（Tab分隔格式）"></textarea>
+                </div>
+
+                <div id="parseResult" style="display:none;">
+                    <div class="parsed-count" id="parsedCount"></div>
+                    <div id="parsedList" style="max-height:300px;overflow-y:auto;"></div>
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="parseData()">解析数据并归类 →</button>
+                </div>
+            </div>
+
+            <!-- 第二步 -->
+            <div class="page" id="page2">
+                <div class="tip">
+                    以下是自动归类后的事件。你可以修改事件标题、调整时间和来源、删除不需要的分组，或手动新增分组。
+                </div>
+                <div class="section">
+                    <div class="section-title">事件归类结果</div>
+                    <div id="groupedEvents"></div>
+                    <button class="add-group-btn" onclick="addManualGroup()">+ 手动添加事件分组</button>
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-secondary" onclick="goToStep(1)">← 返回修改数据</button>
+                    <button class="btn btn-primary" onclick="goToStep(3)">确认，下一步 →</button>
+                </div>
+            </div>
+
+            <!-- 第三步 -->
+            <div class="page" id="page3">
+                <div class="section">
+                    <div class="section-title">舆情提醒</div>
+                    <div class="form-group">
+                        <label>舆情提醒总结（可编辑）</label>
+                        <textarea id="reminder" rows="5" style="width:100%;padding:12px;border:1px solid #ddd;border-radius:8px;font-size:14px;resize:vertical;font-family:inherit;line-height:1.8;"></textarea>
+                    </div>
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-secondary" onclick="goToStep(2)">← 返回修改</button>
+                    <button class="btn btn-secondary" onclick="previewReport()">预览报告</button>
+                    <button class="btn btn-success" onclick="generateDocx()">📄 生成Word文档</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 预览 -->
+    <div class="preview-overlay" id="previewOverlay">
+        <button class="preview-close" onclick="closePreview()">×</button>
+        <div class="preview-container">
+            <div class="preview-content" id="previewContent"></div>
+        </div>
+    </div>
+
+    <!-- Loading -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+        <p>正在生成文档...</p>
+    </div>
+
+    <!-- 引入库 -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+    <script>
+        let parsedRecords = [];
+        let groupedData = [];
+
+        // ==================== 文件上传 ====================
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+
+        // 拖拽
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const file = e.dataTransfer.files[0];
+            if (file) handleFile(file);
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) handleFile(file);
+        });
+
+        function handleFile(file) {
+            const fileNameEl = document.getElementById('fileName');
+            fileNameEl.style.display = 'block';
+            fileNameEl.textContent = '✅ 已选择文件：' + file.name;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const sheetName = workbook.SheetNames[0];
+                    const sheet = workbook.Sheets[sheetName];
+                    const json = XLSX.utils.sheet_to_json(sheet, { defval: '' });
+
+                    if (json.length === 0) {
+                        alert('Excel文件中没有数据');
+                        return;
+                    }
+
+                    // 解析Excel数据
+                    parseExcelData(json);
+                } catch(err) {
+                    alert('读取Excel失败：' + err.message);
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function parseExcelData(json) {
+            parsedRecords = [];
+
+            // 自动识别列名映射
+            const colMap = {};
+            const firstRow = json[0];
+            const keys = Object.keys(firstRow);
+
+            keys.forEach(k => {
+                const kl = k.toLowerCase().trim();
+                if (kl.includes('标题') && !kl.includes('类型')) colMap.title = k;
+                else if (kl.includes('作者') || kl.includes('用户')) colMap.author = k;
+                else if (kl.includes('网站') || kl.includes('来源') || kl.includes('平台')) colMap.website = k;
+                else if (kl.includes('发布时间') || (kl.includes('时间') && !kl.includes('类型'))) colMap.publishTime = k;
+                else if (kl.includes('url') || kl.includes('链接') || kl.includes('网址')) colMap.url = k;
+                else if (kl.includes('摘要') || kl.includes('内容') || kl.includes('正文')) colMap.summary = k;
+                else if (kl.includes('倾向') || kl.includes('情感') || kl.includes('属性')) colMap.sentiment = k;
+                else if (kl.includes('序号')) colMap.num = k;
+            });
+
+            json.forEach((row, i) => {
+                const title = row[colMap.title] || '';
+                if (!title) return;
+
+                // 处理日期（Excel可能存为数字）
+                let timeVal = row[colMap.publishTime] || '';
+                if (typeof timeVal === 'number') {
+                    // Excel日期序列号转换
+                    const excelEpoch = new Date(1899, 11, 30);
+                    const d = new Date(excelEpoch.getTime() + timeVal * 86400000);
+                    timeVal = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+                }
+
+                parsedRecords.push({
+                    num: row[colMap.num] || (i + 1),
+                    title: String(title).trim(),
+                    author: String(row[colMap.author] || '').trim(),
+                    website: String(row[colMap.website] || '').trim(),
+                    publishTime: String(timeVal).trim(),
+                    url: String(row[colMap.url] || '').trim(),
+                    summary: String(row[colMap.summary] || '').trim(),
+                    sentiment: String(row[colMap.sentiment] || '负面').trim(),
+                });
+            });
+
+            showParseResult();
+        }
+
+        // ==================== 步骤切换 ====================
+        function goToStep(n) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(`page${n}`).classList.add('active');
+            document.querySelectorAll('.step').forEach((s, i) => {
+                s.classList.remove('active', 'done');
+                if (i < n - 1) s.classList.add('done');
+                if (i === n - 1) s.classList.add('active');
+            });
+            if (n === 3) generateReminder();
+        }
+
+        // ==================== 解析数据（统一入口） ====================
+        function parseData() {
+            // 如果已经通过Excel上传解析了
+            if (parsedRecords.length > 0) {
+                autoGroupEvents();
+                autoDetectDateRange();
+                setTimeout(() => goToStep(2), 300);
+                return;
+            }
+
+            // 否则尝试解析粘贴的文本
+            const raw = document.getElementById('rawData').value.trim();
+            if (!raw) {
+                alert('请先上传Excel文件或粘贴数据');
+                return;
+            }
+
+            const lines = raw.split('\n').filter(l => l.trim());
+            parsedRecords = [];
+
+            let startIdx = 0;
+            const firstLine = lines[0].toLowerCase();
+            if (firstLine.includes('标题') || firstLine.includes('序号') || firstLine.includes('作者')) {
+                startIdx = 1;
+            }
+
+            for (let i = startIdx; i < lines.length; i++) {
+                const cols = lines[i].split('\t');
+                if (cols.length < 5) continue;
+
+                let record = {};
+                if (cols.length >= 11) {
+                    record = {
+                        num: cols[0].trim(), title: cols[1].trim(), author: cols[2].trim(),
+                        website: cols[3].trim(), publishTime: cols[7].trim(),
+                        url: cols[8].trim(), summary: cols[9].trim(), sentiment: cols[10].trim(),
+                    };
+                } else if (cols.length >= 8) {
+                    record = {
+                        num: cols[0].trim(), title: cols[1].trim(), author: cols[2].trim(),
+                        website: cols[3].trim(), publishTime: cols[4].trim(),
+                        url: cols[5].trim(), summary: cols[6].trim(), sentiment: cols[7].trim(),
+                    };
+                } else {
+                    record = {
+                        num: cols[0].trim(), title: cols[1].trim(),
+                        author: cols[2] ? cols[2].trim() : '', website: cols[3] ? cols[3].trim() : '',
+                        publishTime: cols[4] ? cols[4].trim() : '', url: '', summary: '', sentiment: '负面',
+                    };
+                }
+
+                if (record.title) parsedRecords.push(record);
+            }
+
+            if (parsedRecords.length === 0) {
+                alert('未能解析出有效数据，请检查格式或直接上传Excel文件');
+                return;
+            }
+
+            showParseResult();
+            autoGroupEvents();
+            autoDetectDateRange();
+            setTimeout(() => goToStep(2), 300);
+        }
+
+        function showParseResult() {
+            document.getElementById('parseResult').style.display = 'block';
+            document.getElementById('parsedCount').textContent = `✅ 成功解析 ${parsedRecords.length} 条数据`;
+
+            let listHtml = '';
+            parsedRecords.forEach((r, i) => {
+                listHtml += `
+                    <div class="parsed-item">
+                        <span class="item-num">${i + 1}</span>
+                        <div>
+                            <div class="item-title">${r.title.substring(0, 50)}${r.title.length > 50 ? '...' : ''}</div>
+                            <div class="item-meta">${r.author} | ${r.website} | ${r.publishTime}</div>
+                        </div>
+                    </div>`;
+            });
+            document.getElementById('parsedList').innerHTML = listHtml;
+        }
+
+        // ==================== 自动推断日期 ====================
+        function autoDetectDateRange() {
+            let dates = [];
+            parsedRecords.forEach(r => {
+                if (r.publishTime) {
+                    const d = new Date(r.publishTime.split(' ')[0]);
+                    if (!isNaN(d)) dates.push(d);
+                }
+            });
+            if (dates.length > 0) {
+                dates.sort((a, b) => a - b);
+                document.getElementById('startDate').value = formatISO(dates[0]);
+                document.getElementById('endDate').value = formatISO(dates[dates.length - 1]);
+            }
+        }
+
+        function formatISO(d) {
+            return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+        }
+
+        // ==================== 自动归类 ====================
+        function autoGroupEvents() {
+            const keywords = [
+                { keys: ['助学金', '贫困补助', '补助.*发'], label: '网民反映助学金发放问题' },
+                { keys: ['空调租赁', '租赁费', '空调费', '空调.*钱'], label: '网民反映空调租赁费问题' },
+                { keys: ['教室.*空调', '装空调', '空调.*教室', '闷热.*教室'], label: '网民反映教室空调问题' },
+                { keys: ['洗澡.*水', '水温', '没水.*洗', '热水', '凉水.*洗', '4楼.*水', '水压', '不配洗澡'], label: '网民反映洗澡热水问题' },
+                { keys: ['外卖.*偷', '偷.*外卖'], label: '网民反映外卖被偷问题' },
+                { keys: ['外卖柜', '外卖.*柜'], label: '网民反映外卖柜问题' },
+                { keys: ['食堂', '饭菜.*难吃', '又难吃', '又贵'], label: '网民吐槽食堂问题' },
+                { keys: ['蟑螂', '食品.*安全', '吃出'], label: '网民反映食品安全问题' },
+                { keys: ['招聘.*领导', '领导.*子女', '招聘.*子女'], label: '网民反映招聘公平性问题' },
+                { keys: ['导师.*论文', '论文.*审核', '答辩.*导师', '不给定稿'], label: '网民反映论文审核问题' },
+                { keys: ['教务处.*态度', '老师.*态度.*恶', '不耐烦.*挂'], label: '网民反映教务处服务态度问题' },
+                { keys: ['高考.*志愿', '避雷.*学校', '劝退', '别报', '垃圾学校'], label: '网民发布劝退报考内容' },
+                { keys: ['图书馆.*门', '楼梯.*堵', '拥堵.*换课', '803.*门'], label: '网民反映校园通道拥堵问题' },
+                { keys: ['插座.*电', '自习.*电', '一站式.*电'], label: '网民反映自习室设施问题' },
+            ];
+
+            let groups = [];
+            let used = new Set();
+
+            keywords.forEach(kw => {
+                const matched = [];
+                parsedRecords.forEach((r, i) => {
+                    if (used.has(i)) return;
+                    const text = (r.title + ' ' + r.summary).toLowerCase();
+                    const hit = kw.keys.some(k => new RegExp(k, 'i').test(text));
+                    if (hit) { matched.push(i); used.add(i); }
+                });
+                if (matched.length > 0) {
+                    groups.push({ title: kw.label, records: matched.map(i => parsedRecords[i]) });
+                }
+            });
+
+            // 未归类的单独成组
+            parsedRecords.forEach((r, i) => {
+                if (!used.has(i)) {
+                    let shortTitle = r.title.length > 25 ? r.title.substring(0, 25) + '...' : r.title;
+                    groups.push({ title: '网民反映：' + shortTitle, records: [r] });
+                }
+            });
+
+            groupedData = groups;
+            renderGroups();
+        }
+
+        function renderGroups() {
+            const container = document.getElementById('groupedEvents');
+            let html = '';
+
+            groupedData.forEach((g, i) => {
+                let dates = [];
+                let sources = new Set();
+                g.records.forEach(r => {
+                    if (r.publishTime) {
+                        const d = new Date(r.publishTime.split(' ')[0]);
+                        if (!isNaN(d)) dates.push(d);
+                    }
+                    if (r.website) sources.add(r.website);
+                });
+                dates.sort((a, b) => a - b);
+
+                let dateStr = g.dateOverride || '';
+                if (!dateStr && dates.length > 0) {
+                    const first = dates[0], last = dates[dates.length - 1];
+                    if (first.getTime() === last.getTime()) {
+                        dateStr = `${first.getMonth()+1}月${first.getDate()}日`;
+                    } else {
+                        dateStr = `${first.getMonth()+1}月${first.getDate()}日-${last.getMonth()+1}月${last.getDate()}日`;
+                    }
+                }
+                let sourceStr = g.sourceOverride || Array.from(sources).join('、');
+
+                let postsHtml = '';
+                g.records.forEach(r => {
+                    postsHtml += `<div class="post-item"><span class="post-author">${r.author}</span>：${r.title.substring(0,40)}${r.title.length>40?'...':''}<br><span style="color:#888;font-size:11px;">${r.publishTime} | ${r.website}</span>${r.url ? '<br><span class="post-url">'+r.url+'</span>' : ''}</div>`;
+                });
+
+                html += `
+                    <div class="grouped-event" data-index="${i}">
+                        <div class="ge-header">
+                            <span class="ge-num">${i + 1}</span>
+                            <input type="text" class="ge-title-input" value="${g.title}" onchange="updateGroupTitle(${i}, this.value)">
+                            <button class="ge-delete" onclick="deleteGroup(${i})" title="删除">×</button>
+                        </div>
+                        <div class="ge-info">
+                            <input type="text" value="${dateStr}" placeholder="时间" onchange="updateGroupDate(${i}, this.value)">
+                            <input type="text" value="${sourceStr}" placeholder="信息来源" onchange="updateGroupSource(${i}, this.value)">
+                        </div>
+                        <div class="ge-posts"><strong>包含 ${g.records.length} 条帖文：</strong>${postsHtml}</div>
+                    </div>`;
+            });
+
+            container.innerHTML = html;
+        }
+
+        function updateGroupTitle(idx, val) { groupedData[idx].title = val; }
+        function updateGroupDate(idx, val) { groupedData[idx].dateOverride = val; }
+        function updateGroupSource(idx, val) { groupedData[idx].sourceOverride = val; }
+        function deleteGroup(idx) { groupedData.splice(idx, 1); renderGroups(); }
+        function addManualGroup() {
+            groupedData.push({ title: '新事件', records: [], dateOverride: '', sourceOverride: '' });
+            renderGroups();
+            document.getElementById('groupedEvents').lastElementChild.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // ==================== 舆情提醒 ====================
+        function generateReminder() {
+            const topics = groupedData.map(g => g.title.replace('网民反映', '').replace('网民', '')).slice(0, 6).join('、');
+            const text = `本周舆情监测周期内，共监测到涉校相关信息${parsedRecords.length}条，其中负面及问题类信息主要集中在${topics}等方面。已将相关信息反馈至学生工作部（处）、后勤保障部、教务处等相关单位。`;
+            document.getElementById('reminder').value = text;
+        }
+
+        // ==================== 工具函数 ====================
+        function formatDate(dateStr) {
+            if (!dateStr) return '';
+            const d = new Date(dateStr);
+            return `${d.getFullYear()}.${d.getMonth()+1}.${d.getDate()}`;
+        }
+        function formatDateCN(dateStr) {
+            if (!dateStr) return '';
+            const d = new Date(dateStr);
+            return `${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日`;
+        }
+        function getGroupDate(g) {
+            if (g.dateOverride) return g.dateOverride;
+            let dates = [];
+            g.records.forEach(r => {
+                if (r.publishTime) { const d = new Date(r.publishTime.split(' ')[0]); if (!isNaN(d)) dates.push(d); }
+            });
+            dates.sort((a, b) => a - b);
+            if (dates.length === 0) return '';
+            const first = dates[0], last = dates[dates.length - 1];
+            if (first.getTime() === last.getTime()) return `${first.getMonth()+1}月${first.getDate()}日`;
+            return `${first.getMonth()+1}月${first.getDate()}日-${last.getMonth()+1}月${last.getDate()}日`;
+        }
+        function getGroupSource(g) {
+            if (g.sourceOverride) return g.sourceOverride;
+            let sources = new Set();
+            g.records.forEach(r => { if (r.website) sources.add(r.website); });
+            return Array.from(sources).join('、');
+        }
+
+        // ==================== 收集最终数据 ====================
+        function collectFinalData() {
+            const groupEls = document.querySelectorAll('.grouped-event');
+            groupEls.forEach((el, i) => {
+                if (groupedData[i]) {
+                    groupedData[i].title = el.querySelector('.ge-title-input').value;
+                    const infoInputs = el.querySelectorAll('.ge-info input');
+                    if (infoInputs[0]) groupedData[i].dateOverride = infoInputs[0].value;
+                    if (infoInputs[1]) groupedData[i].sourceOverride = infoInputs[1].value;
+                }
+            });
+
+            const groups = groupedData.map(g => ({
+                title: g.title,
+                date: g.dateOverride || getGroupDate(g),
+                source: g.sourceOverride || getGroupSource(g),
+                records: g.records,
+            }));
+
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            let allSources = new Set();
+            parsedRecords.forEach(r => { if (r.website) allSources.add(r.website); });
+
+            return {
+                issueNum: document.getElementById('issueNum').value,
+                totalIssue: document.getElementById('totalIssue').value,
+                year: document.getElementById('year').value,
+                period: formatDate(startDate) + '-' + formatDate(endDate),
+                startCN: formatDateCN(startDate),
+                endCN: formatDateCN(endDate),
+                publishDate: formatDateCN(endDate),
+                editor: document.getElementById('editor').value || '          ',
+                reviewer: document.getElementById('reviewer').value || '          ',
+                totalCount: parsedRecords.length,
+                platforms: Array.from(allSources).join('、'),
+                reminder: document.getElementById('reminder').value,
+                groups: groups,
+            };
+        }
+
+        // ==================== 预览 ====================
+        function previewReport() {
+            const data = collectFinalData();
+            let tableRows = '';
+            data.groups.forEach((g, i) => {
+                tableRows += `<tr><td>${i+1}</td><td>${g.date}</td><td>${g.title}</td><td>${g.source}</td></tr>`;
+            });
+            let eventDetails = '';
+            data.groups.forEach((g, i) => {
+                eventDetails += `<p class="event-title-preview">${i+1}.标题：${g.title}</p>`;
+                g.records.forEach(r => {
+                    eventDetails += `<p class="indent">${r.publishTime}，网民"${r.author}"在${r.website}发帖称：${r.summary || r.title}</p>`;
+                    if (r.url) eventDetails += `<p class="indent" style="font-size:13px;color:#007bff;word-break:break-all;">${r.url}</p>`;
+                });
+                eventDetails += '<br>';
+            });
+
+            document.getElementById('previewContent').innerHTML = `
+                <p class="red-title">中共陕西理工大学委员会宣传部（网信办）</p>
+                <p class="big-title">信息提醒周报</p>
+                <p class="center-text">（${data.year}年第${data.issueNum}期 总第${data.totalIssue}期）</p>
+                <p class="center-text" style="font-size:14px;">中共陕西理工大学委员会宣传部（网信办）编制           ${data.publishDate}</p><br>
+                <p class="center-text" style="font-size:22px;font-weight:bold;">${data.year}年陕西理工大学信息提醒周报</p><br>
+                <p class="section-heading">【监测周期】${data.period}</p>
+                <p class="section-heading">一、情况综述</p>
+                <p class="indent">根据学校舆情监测软件监测，对${data.startCN}至${data.endCN}涉及我校的负面信息进行综合分析和研究。监测时间段内，共监测相关信息${data.totalCount}条，主要来源于${data.platforms}等网络平台。从舆情调性来看，均为负面信息。</p>
+                <p class="section-heading">二、事件概况（同一事件按一条计算）</p>
+                <table><thead><tr><th>序号</th><th>时间</th><th>事件</th><th>信息来源</th></tr></thead><tbody>${tableRows}</tbody></table>
+                <p class="section-heading">三、事件概述</p>${eventDetails}
+                <p class="section-heading">四、舆情提醒</p>
+                <p class="indent">${data.reminder}</p><br><br>
+                <p>中共陕西理工大学委员会宣传部（网信办）     ${data.publishDate}印发</p>
+                <p>编辑：${data.editor}  审签：${data.reviewer}</p>`;
+            document.getElementById('previewOverlay').classList.add('show');
+        }
+
+        function closePreview() { document.getElementById('previewOverlay').classList.remove('show'); }
+
+        // ==================== 生成Word ====================
+        async function generateDocx() {
+            const loading = document.getElementById('loadingOverlay');
+            loading.classList.add('show');
+
+            try {
+                const data = collectFinalData();
+
+                // 构建表格行
+                let tableRows = '';
+                data.groups.forEach((g, i) => {
+                    tableRows += `<tr><td style="text-align:center;font-family:仿宋;font-size:14pt;border:1px solid black;padding:4px;">${i+1}</td><td style="text-align:center;font-family:仿宋;font-size:14pt;border:1px solid black;padding:4px;">${g.date}</td><td style="text-align:center;font-family:仿宋;font-size:14pt;border:1px solid black;padding:4px;">${g.title}</td><td style="text-align:center;font-family:仿宋;font-size:14pt;border:1px solid black;padding:4px;">${g.source}</td></tr>`;
+                });
+
+                // 构建事件概述（同一类型事件只生成一条，不逐条罗列）
+                let eventDetails = '';
+                data.groups.forEach((g, i) => {
+                    eventDetails += `<p style="font-family:楷体,KaiTi;font-size:16pt;font-weight:bold;margin:15px 0 8px;">${i+1}.标题：${g.title}</p>`;
+                    
+                    if (g.records.length === 1) {
+                        // 只有一条记录，直接输出
+                        const r = g.records[0];
+                        eventDetails += `<p style="font-family:仿宋;font-size:16pt;text-indent:2em;">${r.publishTime}，网民"${r.author}"在${r.website}发帖称：${r.summary || r.title}</p>`;
+                        if (r.url) {
+                            eventDetails += `<p style="font-family:仿宋;font-size:16pt;text-indent:2em;"><span style="color:#0000FF;text-decoration:underline;">${r.url}</span></p>`;
+                        }
+                    } else {
+                        // 多条记录，只生成一条综合描述
+                        let dates = [];
+                        let sources = new Set();
+                        let authors = [];
+                        g.records.forEach(r => {
+                            if (r.publishTime) {
+                                const d = new Date(r.publishTime.split(' ')[0]);
+                                if (!isNaN(d)) dates.push(d);
+                            }
+                            if (r.website) sources.add(r.website);
+                            if (r.author) authors.push(r.author);
+                        });
+                        dates.sort((a, b) => a - b);
+                        
+                        let timeRange = '';
+                        if (dates.length > 0) {
+                            const first = dates[0];
+                            const last = dates[dates.length - 1];
+                            if (first.getTime() === last.getTime()) {
+                                timeRange = `${first.getMonth()+1}月${first.getDate()}日`;
+                            } else {
+                                timeRange = `${first.getMonth()+1}月${first.getDate()}日至${last.getMonth()+1}月${last.getDate()}日`;
+                            }
+                        }
+                        
+                        const sourceStr = Array.from(sources).join('、');
+                        
+                        // 取第一条的摘要作为代表性内容
+                        const firstRecord = g.records[0];
+                        const representativeSummary = firstRecord.summary || firstRecord.title;
+                        const representativeUrl = firstRecord.url;
+                        
+                        eventDetails += `<p style="font-family:仿宋;font-size:16pt;text-indent:2em;">${timeRange}，多名网民（"${authors.slice(0,3).join('"、"')}"等）在${sourceStr}反映相关问题，如网民"${firstRecord.author}"发帖称：${representativeSummary}</p>`;
+                        if (representativeUrl) {
+                            eventDetails += `<p style="font-family:仿宋;font-size:16pt;text-indent:2em;"><span style="color:#0000FF;text-decoration:underline;">${representativeUrl}</span></p>`;
+                        }
+                    }
+                    eventDetails += '<p>&nbsp;</p>';
+                });
+
+                // 构建完整HTML文档（Word可直接打开）
+                const htmlContent = `
+<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
+<head>
+<meta charset="UTF-8">
+<style>
+    @page { margin: 2.54cm 3.17cm; }
+    body { font-family: 仿宋; font-size: 16pt; line-height: 28pt; }
+    table { border-collapse: collapse; width: 100%; }
+    .red-line { border: none; border-bottom: 2px solid red; margin: 0; }
+    .red-double-line { border: none; border-top: 1px solid red; border-bottom: 3px solid red; margin: 8px 0; padding-top: 2px; }
+    .footer-line { border: none; border-bottom: 1px solid black; margin: 10px 0; }
+</style>
+</head>
+<body>
+
+<!-- 版头 -->
+<p style="text-align:center;font-family:宋体,SimSun;font-size:18pt;color:red;font-weight:bold;">中共陕西理工大学委员会宣传部（网信办）</p>
+<p>&nbsp;</p>
+<p style="text-align:center;font-family:宋体,SimSun;font-size:36pt;color:red;font-weight:bold;">信息提醒周报</p>
+<p style="text-align:center;font-family:黑体,SimHei;font-size:16pt;">（${data.year}年第${data.issueNum}期 总第${data.totalIssue}期）</p>
+
+<!-- 编制行：文字在上，下方紧贴红色粗线 -->
+<table style="width:100%;border:none;border-collapse:collapse;margin:0;">
+<tr>
+<td style="border:none;padding:0;font-family:仿宋_GB2312,仿宋;font-size:14pt;text-align:left;">中共陕西理工大学委员会宣传部（网信办）编制</td>
+<td style="border:none;padding:0;font-family:仿宋_GB2312,仿宋;font-size:14pt;text-align:right;">${data.publishDate}</td>
+</tr>
+<tr><td colspan="2" style="border:none;border-top:10px solid red;border-bottom:1px solid red;padding:0;font-size:0;line-height:0;height:4px;">&nbsp;</td></tr>
+</table>
+
+<p>&nbsp;</p>
+
+<!-- 副标题 -->
+<p style="text-align:center;font-family:方正小标宋简体,华文中宋,SimSun;font-size:22pt;">${data.year}年陕西理工大学信息提醒周报</p>
+
+<p>&nbsp;</p>
+
+<!-- 监测周期 -->
+<p style="font-family:黑体,SimHei;font-size:16pt;font-weight:bold;">【监测周期】${data.period}</p>
+
+<!-- 一、情况综述 -->
+<p style="font-family:黑体,SimHei;font-size:16pt;font-weight:bold;">一、情况综述</p>
+<p style="font-family:仿宋;font-size:16pt;text-indent:2em;">根据学校舆情监测软件监测，对${data.startCN}至${data.endCN}涉及我校的负面信息进行综合分析和研究。监测时间段内，共监测相关信息${data.totalCount}条，主要来源于${data.platforms}等网络平台。从舆情调性来看，均为负面信息。</p>
+
+<!-- 二、事件概况 -->
+<p style="font-family:黑体,SimHei;font-size:16pt;font-weight:bold;">二、事件概况（同一事件按一条计算）</p>
+<table>
+<tr><th style="font-family:黑体,SimHei;font-size:14pt;font-weight:bold;border:1px solid black;padding:5px;text-align:center;">序号</th><th style="font-family:黑体,SimHei;font-size:14pt;font-weight:bold;border:1px solid black;padding:5px;text-align:center;">时间</th><th style="font-family:黑体,SimHei;font-size:14pt;font-weight:bold;border:1px solid black;padding:5px;text-align:center;">事件</th><th style="font-family:黑体,SimHei;font-size:14pt;font-weight:bold;border:1px solid black;padding:5px;text-align:center;">信息来源</th></tr>
+${tableRows}
+</table>
+
+<p>&nbsp;</p>
+
+<!-- 三、事件概述 -->
+<p style="font-family:黑体,SimHei;font-size:16pt;font-weight:bold;">三、事件概述</p>
+${eventDetails}
+
+<!-- 四、舆情提醒 -->
+<p style="font-family:黑体,SimHei;font-size:16pt;font-weight:bold;">四、舆情提醒</p>
+<p style="font-family:仿宋;font-size:16pt;text-indent:2em;">${data.reminder}</p>
+
+<p>&nbsp;</p>
+
+<!-- 落款：上下红线包围印发行 -->
+<p style="font-family:仿宋_GB2312,仿宋;font-size:10.5pt;margin:0;padding:2px 0;line-height:1;border-top:2px solid red;border-bottom:2px solid red;white-space:nowrap;">中共陕西理工大学委员会宣传部（网信办）&nbsp;&nbsp;&nbsp;${data.publishDate}印发</p>
+<p>&nbsp;</p>
+<p style="font-family:宋体,SimSun;font-size:10.5pt;margin:0;padding:0;line-height:1.5;">编辑：${data.editor}审签：${data.reviewer}</p>
+
+</body>
+</html>`;
+
+                // 生成Word文件（利用Word兼容HTML的特性）
+                const blob = new Blob([htmlContent], { type: 'application/msword' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `陕西理工大学信息提醒周报（${data.year}年第${data.issueNum}期）.doc`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+
+            } catch (err) {
+                console.error(err);
+                alert('生成失败：' + err.message);
+            } finally {
+                loading.classList.remove('show');
+            }
+        }
+    </script>
+</body>
+</html>
